@@ -11,10 +11,9 @@ def index():
 @app.route('/predict', methods = ['GET'])
 def getCategory():
     try:
-        #data = request.json
-        return  str(request.args['query']) #//str(data)
+        return  str("add model response for"+request.args['query']) #//str(data)
     except :
-        return str(request.args['query'])
+        return str("Error reading query")
     
     
 
