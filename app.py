@@ -33,5 +33,22 @@ def predictPost():
     predict = model.predict(queryString)
     return jsonify({"query":queryString, "group": str(predict[0][0]) })
 
+@app.route('/predictBert', methods=['POST'])
+def predictBert():
+    input_json = request.json
+    queryString = input_json['query'];
+    return jsonify({"query":queryString, "group": "add bert predictions" })
+
+@app.route('/predictDirt', methods=['POST'])
+def predictDirt():
+    input_json = request.json
+    queryString = input_json['query'];
+    return jsonify({"query":queryString, "group": "add dirt predictions" })
+
+@app.route('/PredictGotIt', methods=['POST'])
+def PredictGotIt():
+    input_json = request.json
+    queryString = input_json['query'];
+    return jsonify({"query":queryString, "group": "add got it predictions" })
 
 if __name__ == '__main__': app.run(debug=True)
