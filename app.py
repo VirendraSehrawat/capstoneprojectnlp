@@ -33,11 +33,14 @@ def predictPost():
     predict = model.predict(queryString)
     return jsonify({"query":queryString, "group": str(predict[0][0]) })
 
-@app.route('/predictBert', methods=['POST'])
-def predictBert():
+@app.route('/LSTM', methods=['POST'])
+def predictLSTM():
+    model = fasttext.load_model('LSTM.bin')
     input_json = request.json
     queryString = input_json['query'];
-    return jsonify({"query":queryString, "group": "add bert predictions" })
+    predict = model.predict(queryString)
+    #return jsonify({"query":queryString, "group": str(predict[0][0]) })
+    return jsonify({"query":queryString, "group": "Inside LSTM" })
 
 @app.route('/predictDirt', methods=['POST'])
 def predictDirt():
