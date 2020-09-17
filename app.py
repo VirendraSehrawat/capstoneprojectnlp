@@ -3,7 +3,7 @@ from flask import request
 import fasttext
 from flask.json import jsonify
 import json
-from tensorflow import keras
+import tensorflow as tf
 
 app = Flask(__name__, static_folder='templates')
 
@@ -28,7 +28,7 @@ def getCategory():
 
 @app.route('/LSTM', methods=['POST'])
 def predictLSTM():    
-    model = keras.models.load_model('model_LSTM.h5')
+    model = tf.keras.models.load_model('model_LSTM.h5')
     input_json = request.json
     queryString = input_json['query'];
     predict = model.predict(queryString)
