@@ -3,6 +3,7 @@ from flask import request
 import fasttext
 from flask.json import jsonify
 import json
+from tensorflow import keras
 
 app = Flask(__name__, static_folder='templates')
 
@@ -23,7 +24,26 @@ def getCategory():
         return str(action)
     except :
         return str("Error reading query")
-    
+
+
+@app.route('/LSTM', methods=['POST'])
+def predictLSTM():    
+    model = keras.models.load_model('model_LSTM.h5')
+    input_json = request.json
+    queryString = input_json['query'];
+    predict = model.predict(queryString)
+    return jsonify({"query":queryString, "group": str(predict[0][0]) })
+    #return jsonify({"query":queryString, "group": "Inside LSTM" })
+     
+@app.route('/predictBI_LSTM', methods=['POST'])
+def predictBI_LSTM():
+    model = fasttext.load_model('fasttext_train1.bin')
+    input_json = request.json
+    queryString = input_json['query'];
+    predict = model.predict(queryString)
+    #return jsonify({"query":queryString, "group": str(predict[0][0]) })
+    return jsonify({"query":queryString, "group": "Inside Bi-directonal LSTM" })
+
 @app.route('/predictFasttext', methods=['POST'])
 def predictFasttext():
     # queries = json.loads(request.form)
@@ -41,25 +61,5 @@ def predictFasttexttop5():
     predict = model.predict(queryString)
     #return jsonify({"query":queryString, "group": str(predict[0][0]) })
     return jsonify({"query":queryString, "group": "Inside fasttext_top5" })
-
-@app.route('/LSTM', methods=['POST'])
-def predictLSTM():
-    model = fasttext.load_model('fasttext_train1.bin')
-    input_json = request.json
-    queryString = input_json['query'];
-    predict = model.predict(queryString)
-    #return jsonify({"query":queryString, "group": str(predict[0][0]) })
-    return jsonify({"query":queryString, "group": "Inside LSTM" })
-
-@app.route('/predictBI_LSTM', methods=['POST'])
-def predictBI_LSTM():
-    model = fasttext.load_model('fasttext_train1.bin')
-    input_json = request.json
-    queryString = input_json['query'];
-    predict = model.predict(queryString)
-    #return jsonify({"query":queryString, "group": str(predict[0][0]) })
-    return jsonify({"query":queryString, "group": "Inside Bi-directonal LSTM" })
-
-
 
 if __name__ == '__main__': app.run(debug=True)
