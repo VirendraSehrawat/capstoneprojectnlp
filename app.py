@@ -24,14 +24,23 @@ def getCategory():
     except :
         return str("Error reading query")
     
-@app.route('/predictPost', methods=['POST'])
-def predictPost():
+@app.route('/predictFasttext', methods=['POST'])
+def predictFasttext():
     # queries = json.loads(request.form)
     model = fasttext.load_model('fasttext_train1.bin')
     input_json = request.json
     queryString = input_json['query'];
     predict = model.predict(queryString)
     return jsonify({"query":queryString, "group": str(predict[0][0]) })
+
+@app.route('/predictFasttexttop5', methods=['POST'])
+def predictFasttexttop5():
+    model = fasttext.load_model('fasttext_train_top5.bin')
+    input_json = request.json
+    queryString = input_json['query'];
+    predict = model.predict(queryString)
+    #return jsonify({"query":queryString, "group": str(predict[0][0]) })
+    return jsonify({"query":queryString, "group": "Inside fasttext_top5" })
 
 @app.route('/LSTM', methods=['POST'])
 def predictLSTM():
@@ -42,16 +51,15 @@ def predictLSTM():
     #return jsonify({"query":queryString, "group": str(predict[0][0]) })
     return jsonify({"query":queryString, "group": "Inside LSTM" })
 
-@app.route('/predictDirt', methods=['POST'])
-def predictDirt():
+@app.route('/predictBI_LSTM', methods=['POST'])
+def predictBI_LSTM():
+    model = fasttext.load_model('fasttext_train1.bin')
     input_json = request.json
     queryString = input_json['query'];
-    return jsonify({"query":queryString, "group": "add dirt predictions" })
+    predict = model.predict(queryString)
+    #return jsonify({"query":queryString, "group": str(predict[0][0]) })
+    return jsonify({"query":queryString, "group": "Inside Bi-directonal LSTM" })
 
-@app.route('/PredictGotIt', methods=['POST'])
-def PredictGotIt():
-    input_json = request.json
-    queryString = input_json['query'];
-    return jsonify({"query":queryString, "group": "add got it predictions" })
+
 
 if __name__ == '__main__': app.run(debug=True)
