@@ -35,7 +35,7 @@ def predictPost():
 
 @app.route('/LSTM', methods=['POST'])
 def predictLSTM():
-    model = fasttext.load_model('LSTM.bin')
+    model = fasttext.load_model('fasttext_train1.bin')
     input_json = request.json
     queryString = input_json['query'];
     predict = model.predict(queryString)
