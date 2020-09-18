@@ -60,17 +60,27 @@ def predictBI_LSTM():
 @app.route('/predictFasttext', methods=['POST'])
 def predictFasttext():    
     model = fasttext.load_model('fasttext_train1.bin')
-    input_json = request.json
-    queryString = input_json['query'];
-    predict = model.predict(queryString)
-    return jsonify({"query":queryString, "group": str(predict[0][0])})
+    try:
+        input_string = request.args['query']
+        predict = model.predict(input_string)
+        action = {"Description":input_string,
+        "Suggested Group":str(predict[0])[11:-2]
+        }
+        return str(action)
+    except :
+        return str("Error reading query")
 
 @app.route('/predictFasttexttop5', methods=['POST'])
-def predictFasttexttop5():
+def predictFasttexttop5():    
     model = fasttext.load_model('fasttext_train_top5.bin')
-    input_json = request.json
-    queryString = input_json['query'];
-    predict = model.predict(queryString)
-    return jsonify({"query":queryString, "group": str(predict[0][0])})
+    try:
+        input_string = request.args['query']
+        predict = model.predict(input_string)
+        action = {"Description":input_string,
+        "Suggested Group":str(predict[0])[11:-2]
+        }
+        return str(action)
+    except :
+        return str("Error reading query")
 
 if __name__ == '__main__': app.run(debug=True)
