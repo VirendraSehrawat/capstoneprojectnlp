@@ -54,8 +54,8 @@ def predictBI_LSTM():
     input_json = request.json
     queryString = input_json['query'];
     predict = model.predict(queryString)
-    #return jsonify({"query":queryString, "group": str(predict[0][0]) })
-    return jsonify({"query":queryString, "group": "Inside Bi-directonal LSTM model" })
+    return jsonify({"query":queryString, "group": str(predict[0][0]) })
+    #return jsonify({"query":queryString, "group": "Inside Bi-directonal LSTM model" })
 
 @app.route('/predictFasttext', methods=['POST'])
 def predictFasttext():
@@ -70,9 +70,10 @@ def predictFasttext():
 def predictFasttexttop5():
     model = fasttext.load_model('fasttext_train_top5.bin')
     try:
-        input_string = request.args['query']
-        predict = model.predict(input_string)
-        action = {"Description":input_string,
+        input_json = request.json
+        queryString = input_json['query'];
+        predict = model.predict(queryString)
+        action = {"Description":queryString,
         "Suggested Group":str(predict[0])[11:-2]
         }
         return str(action)
