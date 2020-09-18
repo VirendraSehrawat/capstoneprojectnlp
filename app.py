@@ -41,11 +41,9 @@ def predictLSTM():
     try:
         model = tf.keras.models.load_model('model_LSTM.h5')
         input_json = request.json
-        queryString = input_json['query'];
+        queryString = input_json['query']
         predict = model.predict(queryString)
-        action = {"Description":queryString,
-        "Suggested Group":str(predict[0])[11:-2]
-        }
+        action = jsonify({"query":queryString, "group": str(predict[0][0])})
         return str(action)
     except AssertionError as error:
         return str(error)
@@ -60,13 +58,12 @@ def predictBI_LSTM():
     #return jsonify({"query":queryString, "group": "Inside Bi-directonal LSTM model" })
 
 @app.route('/predictFasttext', methods=['POST'])
-def predictFasttext():
-    # queries = json.loads(request.form)
+def predictFasttext():    
     model = fasttext.load_model('fasttext_train1.bin')
     input_json = request.json
     queryString = input_json['query'];
     predict = model.predict(queryString)
-    return jsonify({"query":queryString, "group": str(predict[0][0]) })
+    return jsonify({"query":queryString, "group": str(predict[0][0])})
 
 @app.route('/predictFasttexttop5', methods=['POST'])
 def predictFasttexttop5():
@@ -74,11 +71,9 @@ def predictFasttexttop5():
     try:
         model = fasttext.load_model('fasttext_train_top5.bin')
         input_json = request.json
-        queryString = input_json['query'];
+        queryString = input_json['query']
         predict = model.predict(queryString)
-        action = {"Description":queryString,
-        "Suggested Group":str(predict[0])[11:-2]
-        }
+        action = jsonify({"query":queryString, "group": str(predict[0][0])})
         return str(action)
     except AssertionError as error:
         return str(error)
