@@ -12,6 +12,15 @@ app = Flask(__name__, static_folder='templates')
 def index():
     return render_template('index.html')
 
+@app.route('/getPredictMethods', methods = ['GET'])
+def getMethods():
+    return jsonify([{"displayname": "LSTM", "method": "LSTM"},
+                    {"displayname": "BI LSTM", "method": "predictBI_LSTM"},
+                    {"displayname": "FastText", "method": "predictFasttext"},
+                    {"displayname": "Fast Text Top 5", "method": "predictFasttexttop5"}
+                    ]);
+
+
 @app.route('/predict', methods = ['GET'])
 def getCategory():
     model = fasttext.load_model('fasttext_train1.bin')
