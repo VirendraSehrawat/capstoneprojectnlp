@@ -51,7 +51,7 @@ def predictBI_LSTM():
     queryString = input_json['query'];
     predict = model.predict(queryString)
     #return jsonify({"query":queryString, "group": str(predict[0][0]) })
-    return jsonify({"query":queryString, "group": "Inside Bi-directonal LSTM" })
+    return jsonify({"query":queryString, "group": "Inside Bi-directonal LSTM model" })
 
 @app.route('/predictFasttext', methods=['POST'])
 def predictFasttext():
