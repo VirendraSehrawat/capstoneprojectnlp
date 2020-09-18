@@ -37,16 +37,18 @@ def getCategory():
 
 @app.route('/LSTM', methods=['POST'])
 def predictLSTM():    
-    model = tf.keras.models.load_model('model_LSTM.h5')
+    
     try:
-        input_string = request.args['query']
-        predict = model.predict(input_string)
-        action = {"Description":input_string,
+        model = tf.keras.models.load_model('model_LSTM.h5')
+        input_json = request.json
+        queryString = input_json['query'];
+        predict = model.predict(queryString)
+        action = {"Description":queryString,
         "Suggested Group":str(predict[0])[11:-2]
         }
         return str(action)
-    except :
-        return str("Error reading query")
+    except AssertionError as error:
+        return str(error)
      
 @app.route('/predictBI_LSTM', methods=['POST'])
 def predictBI_LSTM():
@@ -68,8 +70,9 @@ def predictFasttext():
 
 @app.route('/predictFasttexttop5', methods=['POST'])
 def predictFasttexttop5():
-    model = fasttext.load_model('fasttext_train_top5.bin')
+    
     try:
+        model = fasttext.load_model('fasttext_train_top5.bin')
         input_json = request.json
         queryString = input_json['query'];
         predict = model.predict(queryString)
@@ -77,7 +80,7 @@ def predictFasttexttop5():
         "Suggested Group":str(predict[0])[11:-2]
         }
         return str(action)
-    except :
-        return str("Error reading query")
+    except AssertionError as error:
+        return str(error)
 
 if __name__ == '__main__': app.run(debug=True)
