@@ -67,15 +67,10 @@ def predictFasttext():
 
 @app.route('/predictFasttexttop5', methods=['POST'])
 def predictFasttexttop5():
-    
-    try:
-        model = fasttext.load_model('fasttext_train_top5.bin')
-        input_json = request.json
-        queryString = input_json['query']
-        predict = model.predict(queryString)
-        action = jsonify({"query":queryString, "group": str(predict[0][0])})
-        return str(action)
-    except AssertionError as error:
-        return str(error)
+    model = fasttext.load_model('fasttext_train_top5.bin')
+    input_json = request.json
+    queryString = input_json['query'];
+    predict = model.predict(queryString)
+    return jsonify({"query":queryString, "group": str(predict[0][0])})
 
 if __name__ == '__main__': app.run(debug=True)
