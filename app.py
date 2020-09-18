@@ -38,15 +38,19 @@ def getCategory():
 @app.route('/LSTM', methods=['POST'])
 def predictLSTM():    
     model = tf.keras.models.load_model('model_LSTM.h5')
-    input_json = request.json
-    queryString = input_json['query'];
-    predict = model.predict(queryString)
-    return jsonify({"query":queryString, "group": str(predict[0][0]) })
-    #return jsonify({"query":queryString, "group": "Inside LSTM" })
+    try:
+        input_string = request.args['query']
+        predict = model.predict(input_string)
+        action = {"Description":input_string,
+        "Suggested Group":str(predict[0])[11:-2]
+        }
+        return str(action)
+    except :
+        return str("Error reading query")
      
 @app.route('/predictBI_LSTM', methods=['POST'])
 def predictBI_LSTM():
-    model = fasttext.load_model('fasttext_train1.bin')
+    model = tf.keras.models.load_model('model_BiLSTM.bin')
     input_json = request.json
     queryString = input_json['query'];
     predict = model.predict(queryString)
@@ -65,10 +69,14 @@ def predictFasttext():
 @app.route('/predictFasttexttop5', methods=['POST'])
 def predictFasttexttop5():
     model = fasttext.load_model('fasttext_train_top5.bin')
-    input_json = request.json
-    queryString = input_json['query'];
-    predict = model.predict(queryString)
-    #return jsonify({"query":queryString, "group": str(predict[0][0]) })
-    return jsonify({"query":queryString, "group": "Inside fasttext_top5" })
+    try:
+        input_string = request.args['query']
+        predict = model.predict(input_string)
+        action = {"Description":input_string,
+        "Suggested Group":str(predict[0])[11:-2]
+        }
+        return str(action)
+    except :
+        return str("Error reading query")
 
 if __name__ == '__main__': app.run(debug=True)
