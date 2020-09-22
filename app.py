@@ -14,8 +14,7 @@ def index():
 
 @app.route('/getPredictMethods', methods = ['GET'])
 def getMethods():
-    return jsonify([{"displayname": "LSTM", "method": "LSTM"},
-                    {"displayname": "BI LSTM", "method": "predictBI_LSTM"},
+    return jsonify([
                     {"displayname": "FastText", "method": "predictFasttext"},
                     {"displayname": "Fast Text Top 5", "method": "predictFasttexttop5"}
                     ]);
@@ -60,15 +59,19 @@ def predictBI_LSTM():
 @app.route('/predictFasttext', methods=['POST'])
 def predictFasttext():    
     model = fasttext.load_model('fasttext_train1.bin')
-    try:
-        input_string = request.args['query']
-        predict = model.predict(input_string)
-        action = {"Description":input_string,
-        "Suggested Group":str(predict[0])[11:-2]
-        }
-        return str(action)
-    except :
-        return str("Error reading query")
+    input_json = request.json
+    queryString = input_json['query'];
+    prediction = model.predict(queryString, k = 3);
+    print('prediction is ', prediction[0])
+    jsonPrediction = json.dumps(getGroupAndProbabilites(prediction));
+    return jsonify({"query":queryString, "group": str(prediction[0][0].replace('__label__','')), "additionalData" : jsonPrediction})
+
+def getGroupAndProbabilites(predictions):
+    objectList = []
+    for index in range(len(predictions[0])): 
+        objectList.append( {"group": predictions[0][index].replace('__label__',''), "probability": predictions[1][index]})
+    return objectList
+
 
 @app.route('/predictFasttexttop5', methods=['POST'])
 def predictFasttexttop5():    
