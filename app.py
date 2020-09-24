@@ -16,7 +16,8 @@ def index():
 def getMethods():
     return jsonify([
                     {"displayname": "FastText", "method": "predictFasttext"},
-                    {"displayname": "Fast Text Top 5", "method": "predictFasttexttop5"}
+                    {"displayname": "Fast Text Top 5", "method": "predictFasttexttop5"},
+                    {"displayname": "Fast Text Top 10", "method": "predictFasttexttop10"}
                     ]);
 
 
@@ -75,7 +76,22 @@ def getGroupAndProbabilites(predictions):
 
 @app.route('/predictFasttexttop5', methods=['POST'])
 def predictFasttexttop5():    
-    model = fasttext.load_model('fasttext_train_top5.bin')
+    model = fasttext.load_model('Fasttext_Top5Groups.bin')
+    try:
+        input_json = request.json
+        queryString = input_json['query'];
+        predict = model.predict(queryString, k = 2)
+        jsonPrediction = json.dumps(getGroupAndProbabilites(predict));
+        return jsonify({"query":queryString,
+        "group": predict[0][0].replace('__label__',''),  "additionalData" : jsonPrediction
+        })
+    except :
+        return str("Error reading query")
+
+
+@app.route('/predictFasttexttop10', methods=['POST'])
+def predictFasttexttop10():    
+    model = fasttext.load_model('Fasttext_Top10Groups.bin')
     try:
         input_json = request.json
         queryString = input_json['query'];
