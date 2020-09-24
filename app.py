@@ -58,11 +58,11 @@ def predictBI_LSTM():
 
 @app.route('/predictFasttext', methods=['POST'])
 def predictFasttext():    
-    model = fasttext.load_model('fasttext_train1.bin')
+    model = fasttext.load_model('Fasttext_Allgroups.bin')
     input_json = request.json
     queryString = input_json['query'];
     prediction = model.predict(queryString, k = 3);
-    print('prediction is ', prediction[0])
+    print('prediction is ', prediction)
     jsonPrediction = json.dumps(getGroupAndProbabilites(prediction));
     return jsonify({"query":queryString, "group": str(prediction[0][0].replace('__label__','')), "additionalData" : jsonPrediction})
 
@@ -77,12 +77,13 @@ def getGroupAndProbabilites(predictions):
 def predictFasttexttop5():    
     model = fasttext.load_model('fasttext_train_top5.bin')
     try:
-        input_string = request.args['query']
-        predict = model.predict(input_string)
-        action = {"Description":input_string,
-        "Suggested Group":str(predict[0])[11:-2]
-        }
-        return str(action)
+        input_json = request.json
+        queryString = input_json['query'];
+        predict = model.predict(queryString, k = 4)
+        jsonPrediction = json.dumps(getGroupAndProbabilites(predict));
+        return jsonify({"query":queryString,
+        "group": predict[0][0].replace('__label__',''),  "additionalData" : jsonPrediction
+        })
     except :
         return str("Error reading query")
 
