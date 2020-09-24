@@ -79,7 +79,7 @@ def predictFasttexttop5():
     try:
         input_json = request.json
         queryString = input_json['query'];
-        predict = model.predict(queryString, k = 4)
+        predict = model.predict(queryString, k = 2)
         jsonPrediction = json.dumps(getGroupAndProbabilites(predict));
         return jsonify({"query":queryString,
         "group": predict[0][0].replace('__label__',''),  "additionalData" : jsonPrediction
