@@ -3,7 +3,7 @@ from flask import request
 import fasttext
 from flask.json import jsonify
 import json
-import tensorflow as tf
+# import tensorflow as tf
 
 app = Flask(__name__, static_folder='templates')
 
@@ -15,56 +15,43 @@ def index():
 @app.route('/getPredictMethods', methods = ['GET'])
 def getMethods():
     return jsonify([
-                    {"displayname": "FastText", "method": "predictFasttext"},
-                    {"displayname": "Fast Text Top 5", "method": "predictFasttexttop5"},
-                    {"displayname": "Fast Text Top 10", "method": "predictFasttexttop10"}
+                    {"displayname": "Fast Text All Groups", "method": "predictFasttext"},
+                    {"displayname": "Fast Text Top 5 Groups", "method": "predictFasttexttop5"},
+                    {"displayname": "Fast Text Top 10 Groups", "method": "predictFasttexttop10"},
+                    {"displayname": "FT T5 with Preprocessing and without Lemmatization", "method": "predictFtPNl"},
+                    {"displayname": "FT T5 without Preprocessing and Lemmatization", "method": "predictFtNpNl"}
                     ]);
-
-
-@app.route('/predict', methods = ['GET'])
-def getCategory():
-    model = fasttext.load_model('fasttext_train1.bin')
-    try:
-        input_string = request.args['query']
-        predict = model.predict(input_string)
-        action = {"Description":input_string,
-        "Suggested Group":str(predict[0])[11:-2]
-        }
-        return str(action)
-    except :
-        return str("Error reading query")
-
-
-@app.route('/LSTM', methods=['POST'])
-def predictLSTM():    
-    
-    try:
-        model = tf.keras.models.load_model('model_LSTM.h5')
-        input_json = request.json
-        queryString = input_json['query']
-        predict = model.predict(queryString)
-        action = jsonify({"query":queryString, "group": str(predict[0][0])})
-        return str(action)
-    except AssertionError as error:
-        return str(error)
-     
-@app.route('/predictBI_LSTM', methods=['POST'])
-def predictBI_LSTM():
-    model = tf.keras.models.load_model('model_BiLSTM.bin')
-    input_json = request.json
-    queryString = input_json['query'];
-    predict = model.predict(queryString)
-    return jsonify({"query":queryString, "group": str(predict[0][0]) })
-    #return jsonify({"query":queryString, "group": "Inside Bi-directonal LSTM model" })
 
 @app.route('/predictFasttext', methods=['POST'])
 def predictFasttext():    
-    model = fasttext.load_model('Fasttext_Allgroups.bin')
+    return predict('Fasttext_Allgroups.bin', 3)
+
+@app.route('/predictFasttexttop5', methods=['POST'])
+def predictFasttexttop5():    
+    return predict('Fasttext_Top5Groups.bin', 2)
+
+@app.route('/predictFasttexttop10', methods=['POST'])
+def predictFasttexttop10():    
+    return predict('Fasttext_Top10Groups.bin', 2)
+
+@app.route('/predictFtNpNl', methods=['POST'])
+def predictFasttextNpNl():    
+    return predict('Fasttext_Top5Groups_NoPreprocess_NoLemm.bin', 2)
+
+@app.route('/predictFtPNl', methods=['POST'])
+def predictFasttextpNl():    
+    return predict('Fasttext_Top5Groups_Preprocess_NoLemm.bin', 2)
+
+def predict(modelName, count):
+    model = fasttext.load_model(modelName)
     input_json = request.json
     queryString = input_json['query'];
-    prediction = model.predict(queryString, k = 3);
+    prediction = model.predict(queryString, k = count);
     print('prediction is ', prediction)
-    jsonPrediction = json.dumps(getGroupAndProbabilites(prediction));
+    return jsonifyPrediction(prediction, queryString)
+
+def jsonifyPrediction(prediction, queryString):
+    jsonPrediction = json.dumps(getGroupAndProbabilites(prediction))
     return jsonify({"query":queryString, "group": str(prediction[0][0].replace('__label__','')), "additionalData" : jsonPrediction})
 
 def getGroupAndProbabilites(predictions):
@@ -74,33 +61,5 @@ def getGroupAndProbabilites(predictions):
     return objectList
 
 
-@app.route('/predictFasttexttop5', methods=['POST'])
-def predictFasttexttop5():    
-    model = fasttext.load_model('Fasttext_Top5Groups_NoPreprocess_NoLemm.bin')
-    try:
-        input_json = request.json
-        queryString = input_json['query'];
-        predict = model.predict(queryString, k = 2)
-        jsonPrediction = json.dumps(getGroupAndProbabilites(predict));
-        return jsonify({"query":queryString,
-        "group": predict[0][0].replace('__label__',''),  "additionalData" : jsonPrediction
-        })
-    except :
-        return str("Error reading query")
-
-
-@app.route('/predictFasttexttop10', methods=['POST'])
-def predictFasttexttop10():    
-    model = fasttext.load_model('Fasttext_Top10Groups.bin')
-    try:
-        input_json = request.json
-        queryString = input_json['query'];
-        predict = model.predict(queryString, k = 2)
-        jsonPrediction = json.dumps(getGroupAndProbabilites(predict));
-        return jsonify({"query":queryString,
-        "group": predict[0][0].replace('__label__',''),  "additionalData" : jsonPrediction
-        })
-    except :
-        return str("Error reading query")
 
 if __name__ == '__main__': app.run(debug=True)
