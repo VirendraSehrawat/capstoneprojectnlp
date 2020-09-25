@@ -76,7 +76,7 @@ def getGroupAndProbabilites(predictions):
 
 @app.route('/predictFasttexttop5', methods=['POST'])
 def predictFasttexttop5():    
-    model = fasttext.load_model('Fasttext_Top5Groups.bin')
+    model = fasttext.load_model('Fasttext_Top5Groups_NoPreprocess_NoLemm.bin')
     try:
         input_json = request.json
         queryString = input_json['query'];
